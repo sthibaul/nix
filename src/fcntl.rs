@@ -307,7 +307,11 @@ fn readlink_maybe_at<P: ?Sized + NixPath>(
 }
 
 fn inner_readlink<P: ?Sized + NixPath>(dirfd: Option<RawFd>, path: &P) -> Result<OsString> {
-    let mut v = Vec::with_capacity(libc::PATH_MAX as usize);
+    #[cfg(not(target_os = "hurd"))]
+    const PATH_MAX: usize = libc::PATH_MAX as usize;
+    #[cfg(target_os = "hurd")]
+    const PATH_MAX: usize = 1024;
+    let mut v = Vec::with_capacity(PATH_MAX as usize);
     // simple case: result is strictly less than `PATH_MAX`
     let res = readlink_maybe_at(dirfd, path, &mut v)?;
     let len = Errno::result(res)?;
@@ -338,7 +342,7 @@ fn inner_readlink<P: ?Sized + NixPath>(dirfd: Option<RawFd>, path: &P) -> Result
     } else {
         // If lstat doesn't cooperate, or reports an error, be a little less
         // precise.
-        (libc::PATH_MAX as usize).max(128) << 1
+        PATH_MAX.max(128) << 1
     };
     loop {
         v.reserve_exact(try_size);
