@@ -656,10 +656,11 @@ fn test_acct() {
     acct::disable().unwrap();
 }
 
+#[cfg(not(target_os = "hurd"))]
 #[test]
 fn test_fpathconf_limited() {
     let f = tempfile().unwrap();
-    // AFAIK, PATH_MAX is limited on all platforms, so it makes a good test
+    // PATH_MAX is limited on most platforms, so it makes a good test
     let path_max = fpathconf(f, PathconfVar::PATH_MAX);
     assert!(
         path_max
@@ -669,9 +670,10 @@ fn test_fpathconf_limited() {
     );
 }
 
+#[cfg(not(target_os = "hurd"))]
 #[test]
 fn test_pathconf_limited() {
-    // AFAIK, PATH_MAX is limited on all platforms, so it makes a good test
+    // PATH_MAX is limited on most platforms, so it makes a good test
     let path_max = pathconf("/", PathconfVar::PATH_MAX);
     assert!(
         path_max
@@ -681,9 +683,10 @@ fn test_pathconf_limited() {
     );
 }
 
+#[cfg(not(target_os = "hurd"))]
 #[test]
 fn test_sysconf_limited() {
-    // AFAIK, OPEN_MAX is limited on all platforms, so it makes a good test
+    // OPEN_MAX is limited on most platforms, so it makes a good test
     let open_max = sysconf(SysconfVar::OPEN_MAX);
     assert!(
         open_max

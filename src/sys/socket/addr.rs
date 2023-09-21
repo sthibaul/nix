@@ -162,6 +162,7 @@ pub enum AddressFamily {
         target_os = "aix",
         solarish,
         apple_targets,
+        target_os = "hurd",
         target_os = "redox",
     )))]
     Bluetooth = libc::AF_BLUETOOTH,
@@ -177,6 +178,7 @@ pub enum AddressFamily {
         target_os = "aix",
         solarish,
         target_os = "haiku",
+        target_os = "hurd",
         target_os = "redox",
     )))]
     Isdn = libc::AF_ISDN,
@@ -1059,7 +1061,7 @@ impl std::str::FromStr for SockaddrIn6 {
 pub union SockaddrStorage {
     #[cfg(linux_android)]
     alg: AlgAddr,
-    #[cfg(all(feature = "net", not(target_os = "redox")))]
+    #[cfg(all(feature = "net", not(any(target_os = "hurd", target_os = "redox"))))]
     #[cfg_attr(docsrs, doc(cfg(feature = "net")))]
     dl: LinkAddr,
     #[cfg(linux_android)]
@@ -2124,7 +2126,7 @@ mod tests {
         }
     }
 
-    #[cfg(not(target_os = "redox"))]
+    #[cfg(not(any(target_os = "hurd", target_os = "redox")))]
     mod link {
         #![allow(clippy::cast_ptr_alignment)]
 

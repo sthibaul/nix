@@ -16,6 +16,7 @@ cfg_if! {
         bsd,
         target_os = "android",
         target_os = "aix",
+        target_os = "hurd",
         all(target_os = "linux", not(target_env = "gnu"))
     ))]{
         use libc::rlimit;

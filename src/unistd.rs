@@ -22,7 +22,7 @@ use crate::{Error, NixPath, Result};
 use cfg_if::cfg_if;
 use libc::{
     self, c_char, c_int, c_long, c_uint, gid_t, mode_t, off_t, pid_t, size_t,
-    uid_t, PATH_MAX,
+    uid_t,
 };
 use std::convert::Infallible;
 #[cfg(not(target_os = "redox"))]
@@ -669,8 +669,13 @@ pub fn getcwd() -> Result<PathBuf> {
                 }
             }
 
+            #[cfg(not(target_os = "hurd"))]
+            const PATH_MAX: usize = libc::PATH_MAX as usize;
+            #[cfg(target_os = "hurd")]
+            const PATH_MAX: usize = 1024;
+
             // Trigger the internal buffer resizing logic.
-            reserve_double_buffer_size(&mut buf, PATH_MAX as usize)?;
+            reserve_double_buffer_size(&mut buf, PATH_MAX)?;
         }
     }
 }
@@ -1193,6 +1198,7 @@ feature! {
     freebsdlike,
     solarish,
     target_os = "emscripten",
+    target_os = "hurd",
     target_os = "redox",
     netbsdlike,
 ))]
@@ -3483,7 +3489,10 @@ feature! {
 /// (see [`ttyname(3)`](https://man7.org/linux/man-pages/man3/ttyname.3.html)).
 #[cfg(not(target_os = "fuchsia"))]
 pub fn ttyname<F: AsFd>(fd: F) -> Result<PathBuf> {
+    #[cfg(not(target_os = "hurd"))]
     const PATH_MAX: usize = libc::PATH_MAX as usize;
+    #[cfg(target_os = "hurd")]
+    const PATH_MAX: usize = 1024;
     let mut buf = vec![0_u8; PATH_MAX];
     let c_buf = buf.as_mut_ptr().cast();
 

@@ -77,7 +77,7 @@ libc_bitflags! {
         /// Do not reserve swap space for this mapping.
         ///
         /// This was removed in FreeBSD 11 and is unused in DragonFlyBSD.
-        #[cfg(not(any(freebsdlike, target_os = "aix")))]
+        #[cfg(not(any(freebsdlike, target_os = "aix", target_os = "hurd")))]
         MAP_NORESERVE;
         /// Populate page tables for a mapping.
         #[cfg(linux_android)]
@@ -264,7 +264,7 @@ libc_enum! {
         #[cfg(linux_android)]
         MADV_DODUMP,
         /// Specify that the application no longer needs the pages in the given range.
-        #[cfg(not(target_os = "aix"))]
+        #[cfg(not(any(target_os = "aix", target_os = "hurd")))]
         MADV_FREE,
         /// Request that the system not flush the current range to disk unless it needs to.
         #[cfg(freebsdlike)]
